@@ -150,8 +150,12 @@ class Leaf(AbstractLayer):
 
     def forward(self, x, dropout_inference=0.0, dropout_cf=False):
         # Forward through base distribution
+        # input with values of np.inf are marginalized out
         d = self._get_base_distribution()
+        
+        
         x = dist_forward(d, x)
+        x[x == -torch.inf] = float('nan')
 
         x = self._marginalize_input(x)
         x = self._apply_dropout(x)
